@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoonTV - 开源影视聚合播放器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .video-placeholder {
+            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+                          linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+                          linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+                          linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+        .line-clamp-2 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-film text-2xl"></i>
+                    <h1 class="text-2xl font-bold">MoonTV</h1>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <button id="searchBtn" class="hover:text-gray-200 transition-colors">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button id="userBtn" class="hover:text-gray-200 transition-colors">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <button id="settingsBtn" class="hover:text-gray-200 transition-colors">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-6">
+            <div class="max-w-2xl mx-auto">
+                <div class="relative">
+                    <input type="text" 
+                           placeholder="搜索电影、电视剧、综艺..." 
+                           class="w-full px-4 py-3 pl-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="flex space-x-4 mb-8 overflow-x-auto pb-2">
+            <button class="category-btn px-4 py-2 bg-purple-600 text-white rounded-full font-medium whitespace-nowrap">
+                全部
+            </button>
+            <button class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full font-medium whitespace-nowrap hover:bg-gray-300 transition-colors">
+                电影
+            </button>
+            <button class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full font-medium whitespace-nowrap hover:bg-gray-300 transition-colors">
+                电视剧
+            </button>
+            <button class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full font-medium whitespace-nowrap hover:bg-gray-300 transition-colors">
+                综艺
+            </button>
+            <button class="category-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full font-medium whitespace-nowrap hover:bg-gray-300 transition-colors">
+                动漫
+            </button>
+        </div>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">热门推荐</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6" id="hotVideos">
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">最近更新</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="recentVideos">
+            </div>
+        </section>
+    </main>
+
+    <div id="playerModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl max-w-4xl w-full">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <h3 class="text-lg font-semibold" id="videoTitle">视频播放</h3>
+                    <button onclick="closePlayer()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                </div>
+                <div class="p-4">
+                    <div class="video-placeholder w-full h-64 rounded-lg flex items-center justify-center">
+                    </div>
+                    <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-sm text-gray-600">正在加载视频源，请稍候...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2025 MoonTV - 开源影视聚合播放器</p>
+            <p class="text-gray-400 text-sm mt-2">基于Cloudflare Pages部署</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+
+{
+  "name": "moontv-app",
+  "version": "1.0.0",
+  "description": "基于Cloudflare Pages部署的免费开源影视聚合播放器",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000 || php -S localhost:8000 || npx http-server",
+    "dev": "live-server --port=8000"
+  },
+  "keywords": [
+    "video",
+    "player",
+    "streaming",
+    "movies",
+    "tv-shows",
+    "cloudflare",
+    "github"
+  ],
+  "author": "MoonTV Team",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
